@@ -43,15 +43,15 @@ class ProdutoController extends Produto {
             const dadosRecebidosProduto = req.body;
 
             // Validação de dados obrigatórios
-            if (!dadosRecebidosProduto.nome_produto || 
-                !dadosRecebidosProduto.codigo_produto || 
+            if (!dadosRecebidosProduto.nome || 
+                !dadosRecebidosProduto.codigo || 
                 !dadosRecebidosProduto.descricao || 
-                !dadosRecebidosProduto.preco || 
-                !dadosRecebidosProduto.quantidade_estoque || 
+                !dadosRecebidosProduto.preco_unitario || 
+                dadosRecebidosProduto.quantidade_disponivel === undefined || 
                 !dadosRecebidosProduto.quantidade_minima || 
                 !dadosRecebidosProduto.status) {
                 return res.status(400).json({ 
-                    mensagem: "Dados obrigatórios faltando. Verifique: nome_produto, codigo_produto, descricao, preco, quantidade_estoque, quantidade_minima e status." 
+                    mensagem: "Dados obrigatórios faltando. Verifique: nome, codigo, descricao, preco_unitario, quantidade_disponivel, quantidade_minima e status." 
                 });
             }
 
@@ -67,14 +67,14 @@ class ProdutoController extends Produto {
             }
 
             // Validação de preço
-            if (dadosRecebidosProduto.preco <= 0) {
+            if (dadosRecebidosProduto.preco_unitario <= 0) {
                 return res.status(400).json({ 
                     mensagem: "O preço deve ser maior que zero." 
                 });
             }
 
             // Validação de quantidade
-            if (dadosRecebidosProduto.quantidade_estoque < 0) {
+            if (dadosRecebidosProduto.quantidade_disponivel < 0) {
                 return res.status(400).json({ 
                     mensagem: "A quantidade em estoque não pode ser negativa." 
                 });
@@ -267,10 +267,10 @@ class ProdutoController extends Produto {
             listaProdutos.forEach((produto: Produto) => {
                 const status = produto.getStatus().toUpperCase();
                 const quantidade = produto.getQuantidadeEstoque();
-                const preco = produto.getPreco();
+                const preco_unitario = produto.getPreco();
 
                 totalEstoque += quantidade;
-                valorTotalEstoque += quantidade * preco;
+                valorTotalEstoque += quantidade * preco_unitario;
 
                 switch(status) {
                     case 'ATIVO':

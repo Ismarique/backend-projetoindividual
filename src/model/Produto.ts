@@ -137,13 +137,13 @@ class Produto {
             respostaBD.rows.forEach((produtoBD: any) => {
                 const novoProduto: Produto = new Produto(
                     produtoBD.id_categoria,
-                    produtoBD.nome_produto,
-                    produtoBD.codigo_produto,
+                    produtoBD.nome,
+                    produtoBD.codigo,
                     produtoBD.descricao,
-                    produtoBD.preco,
-                    produtoBD.quantidade_estoque,
+                    produtoBD.preco_unitario,
+                    produtoBD.quantidade_disponivel,
                     produtoBD.quantidade_minima,
-                    produtoBD.status,
+                    produtoBD.status ?? (produtoBD.ativo ? "ATIVO" : "INATIVO"),
                     produtoBD.ativo  // NOVO: passando o valor de ativo
                 );
 
@@ -174,13 +174,13 @@ class Produto {
             respostaBD.rows.forEach((produtoBD: any) => {
                 const novoProduto: Produto = new Produto(
                     produtoBD.id_categoria,
-                    produtoBD.nome_produto,
-                    produtoBD.codigo_produto,
+                    produtoBD.nome,
+                    produtoBD.codigo,
                     produtoBD.descricao,
-                    produtoBD.preco,
-                    produtoBD.quantidade_estoque,
+                    produtoBD.preco_unitario,
+                    produtoBD.quantidade_disponivel,
                     produtoBD.quantidade_minima,
-                    produtoBD.status,
+                    produtoBD.status ?? (produtoBD.ativo ? "ATIVO" : "INATIVO"),
                     produtoBD.ativo
                 );
 
@@ -197,23 +197,21 @@ class Produto {
 
     static async cadastrarProduto(produto: ProdutoDTO): Promise<boolean> {
         try {
-            // MODIFICADO: Adicionado campo ativo na query
             const queryInsertProduto: string = `INSERT INTO produto 
-                (id_categoria, nome_produto, codigo_produto, descricao, preco, 
-                 quantidade_estoque, quantidade_minima, status, ativo)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+                (id_categoria, nome, codigo, descricao, preco_unitario, 
+                 quantidade_disponivel, quantidade_minima, ativo)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 RETURNING id_produto;`;
 
             const respostaBD = await database.query(queryInsertProduto, [
                 produto.id_categoria,
-                produto.nome_produto.toUpperCase(),
-                produto.codigo_produto,
+                produto.nome.toUpperCase(),
+                produto.codigo,
                 produto.descricao.toUpperCase(),
-                produto.preco,
-                produto.quantidade_estoque,
+                produto.preco_unitario,
+                produto.quantidade_disponivel,
                 produto.quantidade_minima,
-                produto.status.toUpperCase(),
-                produto.ativo !== undefined ? produto.ativo : true  // NOVO: ativo com valor padrão
+                produto.ativo !== undefined ? produto.ativo : true
             ]);
 
             if (respostaBD.rows.length > 0) {
@@ -231,17 +229,28 @@ class Produto {
     static async listarProduto(id_produto: number): Promise<Produto | null> {
         try {
             // MODIFICADO: Adicionado filtro de ativo
-            const querySelectProduto = `SELECT * FROM produto WHERE id_produto=$1 AND ativo = true;`;
+            const querySelectProduto = `SELECT
+                                        id_produto,
+                                        id_categoria,
+                                        nome,
+                                        codigo,
+                                        descricao,
+                                        preco_unitario,
+                                        quantidade_disponivel,
+                                        quantidade_minima,
+                                        ativo,
+                                        status
+                                        FROM produtos;`;
             const respostaBD = await database.query(querySelectProduto, [id_produto]);
 
             if (respostaBD.rowCount != 0) {
                 const produto: Produto = new Produto(
                     respostaBD.rows[0].id_categoria,
-                    respostaBD.rows[0].nome_produto,
-                    respostaBD.rows[0].codigo_produto,
+                    respostaBD.rows[0].nome,
+                    respostaBD.rows[0].codigo,
                     respostaBD.rows[0].descricao,
-                    respostaBD.rows[0].preco,
-                    respostaBD.rows[0].quantidade_estoque,
+                    respostaBD.rows[0].preco_unitario,
+                    respostaBD.rows[0].quantidade_disponivel,
                     respostaBD.rows[0].quantidade_minima,
                     respostaBD.rows[0].status,
                     respostaBD.rows[0].ativo
@@ -268,11 +277,11 @@ class Produto {
             if (respostaBD.rowCount != 0) {
                 const produto: Produto = new Produto(
                     respostaBD.rows[0].id_categoria,
-                    respostaBD.rows[0].nome_produto,
-                    respostaBD.rows[0].codigo_produto,
+                    respostaBD.rows[0].nome,
+                    respostaBD.rows[0].codigo,
                     respostaBD.rows[0].descricao,
                     respostaBD.rows[0].preco,
-                    respostaBD.rows[0].quantidade_estoque,
+                    respostaBD.rows[0].quantidade_disponivel,
                     respostaBD.rows[0].quantidade_minima,
                     respostaBD.rows[0].status,
                     respostaBD.rows[0].ativo
@@ -320,11 +329,11 @@ class Produto {
             respostaBD.rows.forEach((produtoBD: any) => {
                 const novoProduto: Produto = new Produto(
                     produtoBD.id_categoria,
-                    produtoBD.nome_produto,
-                    produtoBD.codigo_produto,
+                    produtoBD.nome,
+                    produtoBD.codigo,
                     produtoBD.descricao,
-                    produtoBD.preco,
-                    produtoBD.quantidade_estoque,
+                    produtoBD.preco_unitario,
+                    produtoBD.quantidade_disponivel,
                     produtoBD.quantidade_minima,
                     produtoBD.status,
                     produtoBD.ativo
