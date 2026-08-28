@@ -183,44 +183,7 @@ class ProdutoController extends Produto {
         }
     }
 
-    static async produtosPorStatus(req: Request, res: Response): Promise<Response> {
-        try {
-            const status: string = req.params.status as string;
-
-            const statusValido = ['ATIVO', 'INATIVO', 'EM_FALTA', 'DESCONTINUADO'].includes(
-                status.toUpperCase()
-            );
-            
-            if (!statusValido) {
-                return res.status(400).json({ 
-                    mensagem: "Status inválido. Deve ser: ATIVO, INATIVO, EM_FALTA ou DESCONTINUADO." 
-                });
-            }
-
-            const listaProdutos = await Produto.listarProdutos(); // Já filtra apenas ativos
-            
-            if (listaProdutos === null) {
-                return res.status(500).json({ mensagem: "Erro ao buscar produtos." });
-            }
-
-            const produtosFiltrados = listaProdutos.filter(
-                (produto: Produto) => produto.getStatus().toUpperCase() === status.toUpperCase()
-            );
-
-            if (produtosFiltrados.length === 0) {
-                return res.status(200).json({ 
-                    mensagem: `Nenhum produto ativo com status ${status} encontrado.`,
-                    dados: []
-                });
-            }
-
-            return res.status(200).json(produtosFiltrados);
-        } catch (error) {
-            console.error(`Erro ao acessar o modelo. ${error}`);
-            return res.status(500).json({ mensagem: "Não foi possível recuperar os produtos por status." });
-        }
-    }
-
+    
     static async produtosEstoqueBaixo(req: Request, res: Response): Promise<Response> {
         try {
             const listaProdutos = await Produto.listarProdutos(); // Já filtra apenas ativos
@@ -230,7 +193,7 @@ class ProdutoController extends Produto {
             }
 
             const produtosEstoqueBaixo = listaProdutos.filter(
-                (produto: Produto) => produto.getQuantidadeEstoque() <= produto.getQuantidadeMinima()
+                (produto: Produto) => produto.getQuantidadeDisponivel() <= produto.getQuantidadeMinima()
             );
 
             if (produtosEstoqueBaixo.length === 0) {
@@ -265,27 +228,12 @@ class ProdutoController extends Produto {
             let produtosEstoqueBaixo = 0;
 
             listaProdutos.forEach((produto: Produto) => {
-                const status = produto.getStatus().toUpperCase();
-                const quantidade = produto.getQuantidadeEstoque();
+                const quantidade = produto.getQuantidadeDisponivel();
                 const preco_unitario = produto.getPreco();
 
                 totalEstoque += quantidade;
                 valorTotalEstoque += quantidade * preco_unitario;
 
-                switch(status) {
-                    case 'ATIVO':
-                        produtosAtivos++;
-                        break;
-                    case 'INATIVO':
-                        produtosInativos++;
-                        break;
-                    case 'EM_FALTA':
-                        produtosEmFalta++;
-                        break;
-                    case 'DESCONTINUADO':
-                        produtosDescontinuados++;
-                        break;
-                }
 
                 if (quantidade <= produto.getQuantidadeMinima()) {
                     produtosEstoqueBaixo++;

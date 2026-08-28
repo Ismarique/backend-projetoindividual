@@ -11,9 +11,8 @@ class Produto {
     private codigoProduto: number;
     private descricao: string;
     private preco: number;
-    private quantidadeEstoque: number;
+    private quantidadeDisponivel: number;
     private quantidadeMinima: number;
-    private status: string;
     private ativo: boolean;  // NOVO ATRIBUTO
     private dataCadastro: Date;
 
@@ -23,9 +22,8 @@ class Produto {
         _codigoProduto: number,
         _descricao: string,
         _preco: number,
-        _quantidadeEstoque: number,
+        _quantidadeDisponivel: number,
         _quantidadeMinima: number,
-        _status: string,
         _ativo: boolean = true,  // NOVO PARÂMETRO COM VALOR PADRÃO
         _dataCadastro: Date = new Date()
     ) {
@@ -34,9 +32,8 @@ class Produto {
         this.codigoProduto = _codigoProduto;
         this.descricao = _descricao;
         this.preco = _preco;
-        this.quantidadeEstoque = _quantidadeEstoque;
+        this.quantidadeDisponivel = _quantidadeDisponivel;
         this.quantidadeMinima = _quantidadeMinima;
-        this.status = _status;
         this.ativo = _ativo;  // NOVO ATRIBUTO
         this.dataCadastro = _dataCadastro;
     }
@@ -90,12 +87,12 @@ class Produto {
         return this.preco;
     }
 
-    public setQuantidadeEstoque(_quantidadeEstoque: number): void {
-        this.quantidadeEstoque = _quantidadeEstoque;
+    public setQuantidadeDisponivel(_quantidadeDisponivel: number): void {
+        this.quantidadeDisponivel = _quantidadeDisponivel;
     }
 
-    public getQuantidadeEstoque(): number {
-        return this.quantidadeEstoque;
+    public getQuantidadeDisponivel(): number {
+        return this.quantidadeDisponivel;
     }
 
     public setQuantidadeMinima(_quantidadeMinima: number): void {
@@ -106,13 +103,6 @@ class Produto {
         return this.quantidadeMinima;
     }
 
-    public setStatus(_status: string): void {
-        this.status = _status;
-    }
-
-    public getStatus(): string {
-        return this.status;
-    }
 
     // NOVO GETTER E SETTER PARA 'ATIVO'
     public setAtivo(_ativo: boolean): void {
@@ -150,8 +140,7 @@ class Produto {
                     produtoBD.preco_unitario,
                     produtoBD.quantidade_disponivel,
                     produtoBD.quantidade_minima,
-                    produtoBD.status ?? (produtoBD.ativo ? "ATIVO" : "INATIVO"),
-                    produtoBD.ativo,
+                    produtoBD.ativo ?? (produtoBD.ativo ? "ATIVO" : "INATIVO"),
                     produtoBD.data_cadastro
                 );
 
@@ -187,9 +176,8 @@ class Produto {
                     produtoBD.descricao,
                     produtoBD.preco_unitario,
                     produtoBD.quantidade_disponivel,
-                    produtoBD.quantidade_minima,
-                    produtoBD.status ?? (produtoBD.ativo ? "ATIVO" : "INATIVO"),
-                    produtoBD.ativo,
+                    produtoBD.quantidade_minima, 
+                    produtoBD.ativo ?? (produtoBD.ativo ? "ATIVO" : "INATIVO"),
                     produtoBD.data_cadastro
                 );
 
@@ -209,7 +197,7 @@ class Produto {
             const queryInsertProduto: string = `INSERT INTO produto 
                 (id_categoria, nome, codigo, descricao, preco_unitario, 
                  quantidade_disponivel, quantidade_minima, ativo, data_cadastro)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9 CURRENT_TIMESTAMP)
                 RETURNING id_produto;`;
 
             const respostaBD = await database.query(queryInsertProduto, [
@@ -220,7 +208,8 @@ class Produto {
                 produto.preco_unitario,
                 produto.quantidade_disponivel,
                 produto.quantidade_minima,
-                produto.ativo !== undefined ? produto.ativo : true
+                produto.ativo !== undefined ? produto.ativo : true,
+                produto.data_cadastro
             ]);
 
             if (respostaBD.rows.length > 0) {
@@ -248,7 +237,6 @@ class Produto {
                                         quantidade_disponivel,
                                         quantidade_minima,
                                         ativo,
-                                        status,
                                         data_cadastro
                                         FROM produtos;`;
             const respostaBD = await database.query(querySelectProduto, [id_produto]);
@@ -262,7 +250,6 @@ class Produto {
                     respostaBD.rows[0].preco_unitario,
                     respostaBD.rows[0].quantidade_disponivel,
                     respostaBD.rows[0].quantidade_minima,
-                    respostaBD.rows[0].status,
                     respostaBD.rows[0].ativo,
                     respostaBD.rows[0].data_cadastro
                 );
@@ -294,7 +281,6 @@ class Produto {
                     respostaBD.rows[0].preco,
                     respostaBD.rows[0].quantidade_disponivel,
                     respostaBD.rows[0].quantidade_minima,
-                    respostaBD.rows[0].status,
                     respostaBD.rows[0].ativo,
                     respostaBD.rows[0].data_cadastro
                 );
@@ -347,7 +333,6 @@ class Produto {
                     produtoBD.preco_unitario,
                     produtoBD.quantidade_disponivel,
                     produtoBD.quantidade_minima,
-                    produtoBD.status,
                     produtoBD.ativo,
                     produtoBD.data_cadastro
                 );
