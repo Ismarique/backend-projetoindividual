@@ -15,6 +15,7 @@ class Produto {
     private quantidadeMinima: number;
     private status: string;
     private ativo: boolean;  // NOVO ATRIBUTO
+    private dataCadastro: Date;
 
     constructor(
         _idCategoria: number,
@@ -25,7 +26,8 @@ class Produto {
         _quantidadeEstoque: number,
         _quantidadeMinima: number,
         _status: string,
-        _ativo: boolean = true  // NOVO PARÂMETRO COM VALOR PADRÃO
+        _ativo: boolean = true,  // NOVO PARÂMETRO COM VALOR PADRÃO
+        _dataCadastro: Date = new Date()
     ) {
         this.idCategoria = _idCategoria;
         this.nomeProduto = _nomeProduto;
@@ -36,6 +38,7 @@ class Produto {
         this.quantidadeMinima = _quantidadeMinima;
         this.status = _status;
         this.ativo = _ativo;  // NOVO ATRIBUTO
+        this.dataCadastro = _dataCadastro;
     }
 
     // Getters e Setters existentes...
@@ -120,6 +123,10 @@ class Produto {
         return this.ativo;
     }
 
+    public getDataCadastro(): Date {
+        return this.dataCadastro;
+    }
+
     /**
      * Retorna os Produtos cadastrados no banco de dados
      * @returns Lista com Produtos cadastrados
@@ -144,7 +151,8 @@ class Produto {
                     produtoBD.quantidade_disponivel,
                     produtoBD.quantidade_minima,
                     produtoBD.status ?? (produtoBD.ativo ? "ATIVO" : "INATIVO"),
-                    produtoBD.ativo  // NOVO: passando o valor de ativo
+                    produtoBD.ativo,
+                    produtoBD.data_cadastro
                 );
 
                 novoProduto.setIdProduto(produtoBD.id_produto);
@@ -181,7 +189,8 @@ class Produto {
                     produtoBD.quantidade_disponivel,
                     produtoBD.quantidade_minima,
                     produtoBD.status ?? (produtoBD.ativo ? "ATIVO" : "INATIVO"),
-                    produtoBD.ativo
+                    produtoBD.ativo,
+                    produtoBD.data_cadastro
                 );
 
                 novoProduto.setIdProduto(produtoBD.id_produto);
@@ -199,8 +208,8 @@ class Produto {
         try {
             const queryInsertProduto: string = `INSERT INTO produto 
                 (id_categoria, nome, codigo, descricao, preco_unitario, 
-                 quantidade_disponivel, quantidade_minima, ativo)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                 quantidade_disponivel, quantidade_minima, ativo, data_cadastro)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP)
                 RETURNING id_produto;`;
 
             const respostaBD = await database.query(queryInsertProduto, [
@@ -239,7 +248,8 @@ class Produto {
                                         quantidade_disponivel,
                                         quantidade_minima,
                                         ativo,
-                                        status
+                                        status,
+                                        data_cadastro
                                         FROM produtos;`;
             const respostaBD = await database.query(querySelectProduto, [id_produto]);
 
@@ -253,7 +263,8 @@ class Produto {
                     respostaBD.rows[0].quantidade_disponivel,
                     respostaBD.rows[0].quantidade_minima,
                     respostaBD.rows[0].status,
-                    respostaBD.rows[0].ativo
+                    respostaBD.rows[0].ativo,
+                    respostaBD.rows[0].data_cadastro
                 );
 
                 produto.setIdProduto(respostaBD.rows[0].id_produto);
@@ -284,7 +295,8 @@ class Produto {
                     respostaBD.rows[0].quantidade_disponivel,
                     respostaBD.rows[0].quantidade_minima,
                     respostaBD.rows[0].status,
-                    respostaBD.rows[0].ativo
+                    respostaBD.rows[0].ativo,
+                    respostaBD.rows[0].data_cadastro
                 );
 
                 produto.setIdProduto(respostaBD.rows[0].id_produto);
@@ -336,7 +348,8 @@ class Produto {
                     produtoBD.quantidade_disponivel,
                     produtoBD.quantidade_minima,
                     produtoBD.status,
-                    produtoBD.ativo
+                    produtoBD.ativo,
+                    produtoBD.data_cadastro
                 );
 
                 novoProduto.setIdProduto(produtoBD.id_produto);

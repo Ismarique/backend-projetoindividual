@@ -9,5 +9,6 @@ export interface  ProdutoDTO {
   quantidade_minima: number;
   ativo: boolean;
   status: string;
+  data_cadastro?: string | Date;
 }
 
