@@ -2,6 +2,7 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import ProdutoController from "./controller/ProdutoController.js";
 import MovimentacaoController from "./controller/MovimentacaoController.js";
+import CategoriaController from "./controller/CategoriaController.js";
 
 const router = Router();
 
@@ -11,6 +12,8 @@ router.get("/api", (req: Request, res: Response) => {
 
 router.get('/api/produtos', ProdutoController.todos);
 router.post('/api/produtos', ProdutoController.novo);
+router.get('/api/categorias', CategoriaController.todas);
+router.post('/api/categorias', CategoriaController.nova);
 router.get('/api/movimentacoes', MovimentacaoController.todas);
 router.post('/api/movimentacoes', MovimentacaoController.nova);
 //router.get('/api/produtos/:idProduto/movimentacoes', MovimentacaoController.todas);
