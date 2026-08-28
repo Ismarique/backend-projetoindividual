@@ -42,30 +42,7 @@ class ProdutoController extends Produto {
         try {
             const dadosRecebidosProduto = req.body;
 
-            // Validação de dados obrigatórios
-            if (!dadosRecebidosProduto.nome || 
-                !dadosRecebidosProduto.codigo || 
-                !dadosRecebidosProduto.descricao || 
-                !dadosRecebidosProduto.preco_unitario || 
-                dadosRecebidosProduto.quantidade_disponivel === undefined || 
-                !dadosRecebidosProduto.quantidade_minima || 
-                !dadosRecebidosProduto.status) {
-                return res.status(400).json({ 
-                    mensagem: "Dados obrigatórios faltando. Verifique: nome, codigo, descricao, preco_unitario, quantidade_disponivel, quantidade_minima e status." 
-                });
-            }
-
-            // Validação de status
-            const statusValido = ['ATIVO', 'INATIVO', 'EM_FALTA', 'DESCONTINUADO'].includes(
-                dadosRecebidosProduto.status.toUpperCase()
-            );
             
-            if (!statusValido) {
-                return res.status(400).json({ 
-                    mensagem: "Status inválido. Deve ser: ATIVO, INATIVO, EM_FALTA ou DESCONTINUADO." 
-                });
-            }
-
             // Validação de preço
             if (dadosRecebidosProduto.preco_unitario <= 0) {
                 return res.status(400).json({ 

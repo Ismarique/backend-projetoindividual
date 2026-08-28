@@ -197,19 +197,19 @@ class Produto {
             const queryInsertProduto: string = `INSERT INTO produto 
                 (id_categoria, nome, codigo, descricao, preco_unitario, 
                  quantidade_disponivel, quantidade_minima, ativo, data_cadastro)
-                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9 CURRENT_TIMESTAMP)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP)
                 RETURNING id_produto;`;
 
             const respostaBD = await database.query(queryInsertProduto, [
                 produto.id_categoria,
                 produto.nome.toUpperCase(),
-                produto.codigo,
+                produto.codigo.toUpperCase(),
                 produto.descricao.toUpperCase(),
                 produto.preco_unitario,
                 produto.quantidade_disponivel,
                 produto.quantidade_minima,
                 produto.ativo !== undefined ? produto.ativo : true,
-                produto.data_cadastro
+                // produto.data_cadastro
             ]);
 
             if (respostaBD.rows.length > 0) {
