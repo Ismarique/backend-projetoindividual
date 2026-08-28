@@ -10,7 +10,7 @@ router.get("/api", (req: Request, res: Response) => {
     res.status(200).json({ mensagem: "Olá seja bem-vindo!"});
 });
 
-router.get('/api/produtos', ProdutoController.todos);
+router.get('/api/produtos', ProdutoController.todosCompletos);
 router.post('/api/produtos', ProdutoController.novo);
 router.get('/api/categorias', CategoriaController.todas);
 router.post('/api/categorias', CategoriaController.nova);
