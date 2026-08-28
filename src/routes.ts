@@ -1,6 +1,7 @@
 import { Router } from "express";
 import type { Request, Response } from "express";
 import ProdutoController from "./controller/ProdutoController.js";
+import MovimentacaoController from "./controller/MovimentacaoController.js";
 
 const router = Router();
 
@@ -10,6 +11,9 @@ router.get("/api", (req: Request, res: Response) => {
 
 router.get('/api/produtos', ProdutoController.todos);
 router.post('/api/produtos', ProdutoController.novo);
+router.get('/api/movimentacoes', MovimentacaoController.todas);
+router.post('/api/movimentacoes', MovimentacaoController.nova);
+//router.get('/api/produtos/:idProduto/movimentacoes', MovimentacaoController.todas);
 //router.get('/produtos/:idProduto', ProdutoController.produto);
 //router.put('/produtos/:idProduto', ProdutoController.atualizarProduto);
 //router.delete('/produtos/:idProduto', ProdutoController.removerProduto);
