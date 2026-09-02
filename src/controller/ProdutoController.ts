@@ -105,7 +105,7 @@ class ProdutoController extends Produto {
     /**
      * NOVO MÉTODO: Busca produto por ID (inclusive inativos)
      */
-    static async produtoCompleto(req: Request, res: Response): Promise<Response> {
+    static async produtoDetalhado(req: Request, res: Response): Promise<Response> {
         try {
             const idProduto: number = parseInt(req.params.idProduto as string);
 
@@ -113,7 +113,7 @@ class ProdutoController extends Produto {
                 return res.status(400).json({ mensagem: "ID inválido." });
             }
 
-            const respostaModelo = await Produto.listarProdutoCompleto(idProduto);
+            const respostaModelo = await Produto.getDetalhesProduto(idProduto);
 
             if (respostaModelo === null) {
                 return res.status(404).json({ mensagem: "Produto não encontrado." });
@@ -206,7 +206,7 @@ class ProdutoController extends Produto {
 
             listaProdutos.forEach((produto: Produto) => {
                 const quantidade = produto.getQuantidadeDisponivel();
-                const preco_unitario = produto.getPreco();
+                const preco_unitario = produto.getPrecoUnitario();
 
                 totalEstoque += quantidade;
                 valorTotalEstoque += quantidade * preco_unitario;
@@ -234,6 +234,7 @@ class ProdutoController extends Produto {
             return res.status(500).json({ mensagem: "Não foi possível gerar o resumo dos produtos." });
         }
     }
+    
 }
 
 export default ProdutoController;

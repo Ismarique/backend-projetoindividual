@@ -7,10 +7,10 @@ const database = new DatabaseModel().pool;
 class Produto {
     private idProduto: number = 0;
     private idCategoria: number;
-    private nomeProduto: string;
-    private codigoProduto: number;
+    private nome: string;
+    private codigo: string;
     private descricao: string;
-    private preco: number;
+    private precoUnitario: number;
     private quantidadeDisponivel: number;
     private quantidadeMinima: number;
     private ativo: boolean;  // NOVO ATRIBUTO
@@ -18,20 +18,20 @@ class Produto {
 
     constructor(
         _idCategoria: number,
-        _nomeProduto: string,
-        _codigoProduto: number,
+        _nome: string,
+        _codigo: string,
         _descricao: string,
-        _preco: number,
+        _precoUnitario: number,
         _quantidadeDisponivel: number,
         _quantidadeMinima: number,
         _ativo: boolean = true,  // NOVO PARÂMETRO COM VALOR PADRÃO
         _dataCadastro: Date = new Date()
     ) {
         this.idCategoria = _idCategoria;
-        this.nomeProduto = _nomeProduto;
-        this.codigoProduto = _codigoProduto;
+        this.nome = _nome;
+        this.codigo = _codigo;
         this.descricao = _descricao;
-        this.preco = _preco;
+        this.precoUnitario = _precoUnitario;
         this.quantidadeDisponivel = _quantidadeDisponivel;
         this.quantidadeMinima = _quantidadeMinima;
         this.ativo = _ativo;  // NOVO ATRIBUTO
@@ -55,20 +55,20 @@ class Produto {
         return this.idCategoria;
     }
 
-    public setNomeProduto(_nomeProduto: string): void {
-        this.nomeProduto = _nomeProduto;
+    public setNomeProduto(_nome: string): void {
+        this.nome = _nome;
     }
 
     public getNomeProduto(): string {
-        return this.nomeProduto;
+        return this.nome;
     }
 
-    public setCodigoProduto(_codigoProduto: number): void {
-        this.codigoProduto = _codigoProduto;
+    public setCodigoProduto(_codigo: string): void {
+        this.codigo = _codigo;
     }
 
-    public getCodigoProduto(): number {
-        return this.codigoProduto;
+    public getCodigoProduto(): string {
+        return this.codigo;
     }
 
     public setDescricao(_descricao: string): void {
@@ -79,12 +79,12 @@ class Produto {
         return this.descricao;
     }
 
-    public setPreco(_preco: number): void {
-        this.preco = _preco;
+    public setPrecoUnitario(_precoUnitario: number): void {
+        this.precoUnitario = _precoUnitario;
     }
 
-    public getPreco(): number {
-        return this.preco;
+    public getPrecoUnitario(): number {
+        return this.precoUnitario;
     }
 
     public setQuantidadeDisponivel(_quantidadeDisponivel: number): void {
@@ -278,7 +278,7 @@ class Produto {
                     respostaBD.rows[0].nome,
                     respostaBD.rows[0].codigo,
                     respostaBD.rows[0].descricao,
-                    respostaBD.rows[0].preco,
+                    respostaBD.rows[0].preco_unitario,
                     respostaBD.rows[0].quantidade_disponivel,
                     respostaBD.rows[0].quantidade_minima,
                     respostaBD.rows[0].ativo,
@@ -347,6 +347,33 @@ class Produto {
             return null;
         }
     }
+    // Controller para buscar detalhes do produto
+    static async getDetalhesProduto(id_produto: number) {
+    try {
+        // Busca o produto pelo ID (inclui inativos para admin)
+        const produto = await Produto.listarProdutoCompleto(id_produto);
+        
+        if (produto) {
+            // Retorna os detalhes completos
+            return {
+                id_produto: produto.getIdProduto(),
+                nome: produto.getNomeProduto(),
+                codigo: produto.getCodigoProduto(),
+                descricao: produto.getDescricao(),
+                preco_unitario: produto.getPrecoUnitario(),
+                quantidade_disponivel: produto.getQuantidadeDisponivel(),
+                quantidade_minima: produto.getQuantidadeMinima(),
+                id_categoria: produto.getIdCategoria(),
+                ativo: produto.getAtivo(),
+                data_cadastro: produto.getDataCadastro()
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Erro ao buscar detalhes do produto:', error);
+        return null;
+    }
+}
 }
 
 export default Produto;

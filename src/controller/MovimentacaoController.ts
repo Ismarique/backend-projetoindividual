@@ -69,7 +69,7 @@ class MovimentacaoController {
 			const id = idProduto === undefined ? undefined : Number(idProduto);
 
 			if (id !== undefined && (!Number.isInteger(id) || id <= 0)) {
-				return res.status(400).json({ mensagem: "ID do produto inválido." });
+				return res.status(400).json({ mensagem: "ID do produto inválido." }); 
 			}
 
 			const movimentacoes = await Movimentacao.listarMovimentacoes(id);
