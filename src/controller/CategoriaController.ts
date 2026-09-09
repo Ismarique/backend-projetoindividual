@@ -38,6 +38,32 @@ class CategoriaController {
 			return res.status(500).json({ mensagem: "Não foi possível cadastrar a categoria." });
 		}
 	}
+
+	static async atualizarCategoria(req: Request, res: Response): Promise<Response> {
+		try {
+			const { idCategoria } = req.params;
+			const dados = req.body as Partial<CategoriaDTO>;
+
+			if (!idCategoria || isNaN(Number(idCategoria))) {
+				return res.status(400).json({ mensagem: "ID da categoria inválido." });
+			}
+
+			if (typeof dados.nome !== "string" || dados.nome.trim() === "") {
+				return res.status(400).json({ mensagem: "Informe o nome da categoria." });
+			}
+
+			const sucesso = await Categoria.atualizarCategoria(Number(idCategoria), { nome: dados.nome });
+
+			if (sucesso) {
+				return res.status(200).json({ mensagem: "Categoria atualizada com sucesso." });
+			}
+
+			return res.status(404).json({ mensagem: "Categoria não encontrada ou não foi possível atualizar." });
+		} catch (error) {
+			console.error(`Erro ao atualizar categoria. ${error}`);
+			return res.status(500).json({ mensagem: "Erro ao atualizar categoria." });
+		}
+	}
 }
 
 export default CategoriaController;
