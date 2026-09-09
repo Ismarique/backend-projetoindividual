@@ -5,10 +5,10 @@ const database = new DatabaseModel().pool;
 
 class Categoria {
 	private idCategoria: number = 0;
-	private nomeCategoria: string;
+	private nome: string;
 
-	constructor(_nomeCategoria: string) {
-		this.nomeCategoria = _nomeCategoria;
+	constructor(_nome: string) {
+		this.nome = _nome;
 	}
 
 	public setIdCategoria(_idCategoria: number): void {
@@ -19,12 +19,12 @@ class Categoria {
 		return this.idCategoria;
 	}
 
-	public setNomeCategoria(_nomeCategoria: string): void {
-		this.nomeCategoria = _nomeCategoria;
+	public setNome(_nome: string): void {
+		this.nome = _nome;
 	}
 
-	public getNomeCategoria(): string {
-		return this.nomeCategoria;
+	public getNome(): string {
+		return this.nome;
 	}
 
 	static async listarCategorias(): Promise<Array<Categoria> | null> {
@@ -55,21 +55,45 @@ class Categoria {
 				`INSERT INTO categoria (nome)
 				 VALUES ($1)
 				 RETURNING id_categoria, nome;`,
-				[categoria.nome.toUpperCase()]
+				[categoria.nome]
 			);
 
 			if (respostaBD.rowCount === 0) {
 				return null;
 			}
 
-			const categoriaCadastrada = new Categoria(respostaBD.rows[0].nome);
-			categoriaCadastrada.setIdCategoria(respostaBD.rows[0].id_categoria);
-			return categoriaCadastrada;
+			const categoriaAtualizada = new Categoria(respostaBD.rows[0].nome);
+			categoriaAtualizada.setIdCategoria(respostaBD.rows[0].id_categoria);
+			return categoriaAtualizada;
 		} catch (error) {
 			console.error(`Erro ao cadastrar categoria. ${error}`);
 			return null;
 		}
 	}
+
+	static async atualizarCategoria(id_categoria: number, categoria: CategoriaDTO): Promise<boolean> {
+		try {
+			const respostaBD = await database.query(
+				`UPDATE categoria
+				 SET nome = $1
+				 WHERE id_categoria = $2;`,
+				[categoria.nome.toUpperCase(), id_categoria]
+			);
+
+			if (respostaBD.rowCount === 0) {
+				return false;
+			}
+
+			console.info(`Categoria ${id_categoria} atualizada com sucesso!`);
+			return true;
+		} catch (error) {
+			console.error(`Erro ao atualizar categoria. ${error}`);
+			return false;
+		}
+	}
+
+
+
 }
 
 export default Categoria;

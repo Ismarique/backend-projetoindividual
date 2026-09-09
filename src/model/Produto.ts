@@ -314,6 +314,47 @@ class Produto {
         }
     }
 
+   static async atualizarProduto(id_produto: number, produto: ProdutoDTO): Promise<boolean> {
+    try {
+        const queryUpdateProduto = `
+            UPDATE produto
+            SET
+                id_categoria = $1,
+                nome= $2,
+                codigo = $3,
+                descricao = $4,
+                preco_unitario = $5,
+                quantidade_disponivel = $6,
+                quantidade_minima = $7,
+                ativo = $8
+            WHERE id_produto = $9;
+        `;
+
+        const valores = [
+            produto.id_categoria,
+            produto.nome,
+            produto.codigo,
+            produto.descricao,
+            produto.preco_unitario,
+            produto.quantidade_disponivel,
+            produto.quantidade_minima,
+            produto.ativo,
+            id_produto
+        ];
+
+        const respostaBD = await database.query(queryUpdateProduto, valores);
+
+        if (respostaBD.rowCount != 0) {
+            console.info(`Produto ${id_produto} atualizado com sucesso!`);
+            return true;
+        }
+        return false;
+    } catch (error) {
+        console.log(`Erro ao atualizar produto. ${error}`);
+        return false;
+    }
+}
+
     /**
      * NOVO MÉTODO: Lista produtos por status de ativo
      */

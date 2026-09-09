@@ -5,7 +5,7 @@ const database = new DatabaseModel().pool;
 
 class Movimentacao {
 	private idMovimentacao: number = 0;
-	private idProduto: number;
+	private id_produto: number;
 	private idMovimentacaoOrigem: number | undefined;
 	private tipo: string;
 	private motivo: string;
@@ -16,7 +16,7 @@ class Movimentacao {
 	private dataMovimentacao: Date;
 
 	constructor(
-		_idProduto: number,
+		_id_produto: number,
 		_tipo: string,
 		_motivo: string,
 		_quantidade: number,
@@ -26,7 +26,7 @@ class Movimentacao {
 		_valorTotal?: number,
 		_dataMovimentacao: Date = new Date()
 	) {
-		this.idProduto = _idProduto;
+		this.id_produto = _id_produto;
 		this.tipo = _tipo;
 		this.motivo = _motivo;
 		this.quantidade = _quantidade;
@@ -45,12 +45,12 @@ class Movimentacao {
 		return this.idMovimentacao;
 	}
 
-	public setIdProduto(_idProduto: number): void {
-		this.idProduto = _idProduto;
+	public setId_produto(_id_produto: number): void {
+		this.id_produto = _id_produto;
 	}
 
-	public getIdProduto(): number {
-		return this.idProduto;
+	public getId_produto(): number {
+		return this.id_produto;
 	}
 
 	public setIdMovimentacaoOrigem(_idMovimentacaoOrigem: number | undefined): void {
@@ -152,21 +152,22 @@ class Movimentacao {
 			const valorTotal = movimentacao.valor_total ?? preco * movimentacao.quantidade;
 
 			const insercao = await client.query(
-				`INSERT INTO movimentacao
-					(id_produto, id_movimentacao_origem, tipo, motivo, quantidade,
-					 preco_unitario_praticado, valor_total, observacao)
-				 VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+				`INSERT INTO movimentacao (
+										    id_produto,
+										    tipo,
+										    motivo,
+										    quantidade,
+										    observacao
+										)
+				 VALUES ($1, $2, $3, $4, $5)
 				 RETURNING id_movimentacao, id_produto, id_movimentacao_origem,
 						   tipo, motivo, quantidade, preco_unitario_praticado,
 						   valor_total, observacao, data_movimentacao;`,
 				[
 					movimentacao.id_produto,
-					movimentacao.id_movimentacao_origem ?? null,
 					movimentacao.tipo,
 					movimentacao.motivo,
 					movimentacao.quantidade,
-					preco,
-					valorTotal,
 					movimentacao.observacao
 				]
 			);
@@ -188,12 +189,38 @@ class Movimentacao {
 		}
 	}
 
-	static async listarMovimentacoes(idProduto?: number): Promise<Array<MovimentacaoDTO>> {
+	
+
+	static async getDetalhesMovimentacao(id_movimentacao: number): Promise<MovimentacaoDTO | null> {
+		try {
+			const respostaBD = await database.query(
+				`SELECT m.id_movimentacao, m.id_produto, m.id_movimentacao_origem,
+						m.tipo, m.motivo, m.quantidade, m.preco_unitario_praticado,
+						m.valor_total, m.observacao, m.data_movimentacao,
+						p.nome AS nome_produto
+				 FROM movimentacao m
+				 INNER JOIN produto p ON p.id_produto = m.id_produto
+				 WHERE m.id_movimentacao = $1;`,
+				[id_movimentacao]
+			);
+
+			if (respostaBD.rowCount === 0) {
+				return null;
+			}
+
+			return respostaBD.rows[0] as MovimentacaoDTO;
+		} catch (error) {
+			console.error(`Erro ao buscar detalhes da movimentação. ${error}`);
+			return null;
+		}
+	}
+
+	static async listarMovimentacoes(id_produto?: number): Promise<Array<MovimentacaoDTO>> {
 		const parametros: number[] = [];
 		let filtro = "";
 
-		if (idProduto !== undefined) {
-			parametros.push(idProduto);
+		if (id_produto !== undefined) {
+			parametros.push(id_produto);
 			filtro = "WHERE m.id_produto = $1";
 		}
 

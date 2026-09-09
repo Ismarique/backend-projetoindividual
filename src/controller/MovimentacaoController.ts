@@ -28,7 +28,7 @@ class MovimentacaoController {
 
 			const movimentacao: MovimentacaoDTO = {
 				id_produto: dados.id_produto,
-				tipo,
+				tipo: dados.tipo,
 				motivo: dados.motivo,
 				quantidade: dados.quantidade,
 				observacao: dados.observacao
@@ -77,6 +77,28 @@ class MovimentacaoController {
 		} catch (error) {
 			console.error(`Erro ao listar movimentações. ${error}`);
 			return res.status(500).json({ mensagem: "Não foi possível listar as movimentações." });
+		}
+	}
+
+
+	static async movimentacaoDetalhada(req: Request, res: Response): Promise<Response> {
+		try {
+			const idMovimentacao: number = parseInt(req.params.idMovimentacao as string);
+
+			if (isNaN(idMovimentacao) || idMovimentacao <= 0) {
+				return res.status(400).json({ mensagem: "ID da movimentação inválido." });
+			}
+
+			const respostaModelo = await Movimentacao.getDetalhesMovimentacao(idMovimentacao);
+
+			if (respostaModelo === null) {
+				return res.status(404).json({ mensagem: "Movimentação não encontrada." });
+			}
+
+			return res.status(200).json(respostaModelo);
+		} catch (error) {
+			console.error(`Erro ao acessar o modelo. ${error}`);
+			return res.status(500).json({ mensagem: "Não foi possível recuperar a movimentação." });
 		}
 	}
 }

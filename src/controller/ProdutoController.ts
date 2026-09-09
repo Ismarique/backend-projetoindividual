@@ -20,6 +20,27 @@ class ProdutoController extends Produto {
         }
     }
 
+    async atualizarProduto(req: Request, res: Response): Promise<Response> {
+        try {
+            const { id_produto } = req.params;
+            const produto: ProdutoDTO = req.body;
+
+            if (!id_produto || isNaN(Number(id_produto))) {
+                return res.status(400).json({ mensagem: "ID de produto inválido." });
+            }
+
+            const sucesso = await Produto.atualizarProduto(Number(id_produto), produto);
+
+            if (sucesso) {
+                return res.status(200).json({ mensagem: "Produto atualizado com sucesso." });
+            }
+            return res.status(404).json({ mensagem: "Produto não encontrado ou não foi possível atualizar." });
+        } catch (error) {
+            console.error(`Erro ao atualizar produto. ${error}`);
+            return res.status(500).json({ mensagem: "Erro ao atualizar produto." });
+        }
+    }
+
     /**
      * NOVO MÉTODO: Lista todos os produtos (inclusive inativos) - para administração
      */

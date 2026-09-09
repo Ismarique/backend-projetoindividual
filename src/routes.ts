@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import ProdutoController from "./controller/ProdutoController.js";
 import MovimentacaoController from "./controller/MovimentacaoController.js";
 import CategoriaController from "./controller/CategoriaController.js";
-
+import { Auth } from "./model/Auth.js";
 const router = Router();
 
 router.get("/api", (req: Request, res: Response) => {
@@ -12,20 +12,20 @@ router.get("/api", (req: Request, res: Response) => {
 
 router.get('/api/produtos', ProdutoController.todos);
 router.post('/api/produtos', ProdutoController.novo);
-router.get('/api/produtos/:idProduto', ProdutoController.produtoDetalhado);
-router.get('/api/categorias', CategoriaController.todas);
-router.post('/api/categorias', CategoriaController.nova);
-router.get('/api/movimentacoes', MovimentacaoController.todas);
-router.post('/api/movimentacoes', MovimentacaoController.nova);
-//router.get('/api/produtos/:idProduto/movimentacoes', MovimentacaoController.todas);
-//router.get('/produtos/:idProduto', ProdutoController.produto);
-//router.put('/produtos/:idProduto', ProdutoController.atualizarProduto);
-//router.delete('/produtos/:idProduto', ProdutoController.removerProduto);
-//router.get('/produtos/categoria/:idCategoria', ProdutoController.produtosPorCategoria);
-//router.get('/produtos/status/:status', ProdutoController.produtosPorStatus);
-//router.get('/produtos/estoque-baixo', ProdutoController.produtosEstoqueBaixo);
-//router.get('/produtos/resumo', ProdutoController.resumoProdutos);
+router.patch('/api/produtos/:idProduto', async (req: Request, res: Response) => {
+    const atualizado = await ProdutoController.atualizarProduto(
+        Number(req.params.idProduto),
+        req.body
+    );
 
-
+    res.status(200).json(atualizado);
+});
+router.get('/api/produtos/:idProduto', Auth.verifyToken,  ProdutoController.produtoDetalhado);
+router.get('/api/categorias', Auth.verifyToken, CategoriaController.todas);
+router.post('/api/categorias', Auth.verifyToken, CategoriaController.nova);
+router.patch('/api/categorias/:idCategoria', Auth.verifyToken, CategoriaController.atualizarCategoria);
+router.get('/api/movimentacao', Auth.verifyToken, MovimentacaoController.todas);
+router.post('/api/movimentacao', Auth.verifyToken, MovimentacaoController.nova);
+router.get('/api/movimentacoes/:idMovimentacao', Auth.verifyToken, MovimentacaoController.movimentacaoDetalhada);
 
 export {router};
