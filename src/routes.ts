@@ -20,12 +20,12 @@ router.patch('/api/produtos/:idProduto', async (req: Request, res: Response) => 
 
     res.status(200).json(atualizado);
 });
-router.get('/api/produtos/:idProduto', Auth.verifyToken,  ProdutoController.produtoDetalhado);
-router.get('/api/categorias', Auth.verifyToken, CategoriaController.todas);
-router.post('/api/categorias', Auth.verifyToken, CategoriaController.nova);
-router.patch('/api/categorias/:idCategoria', Auth.verifyToken, CategoriaController.atualizarCategoria);
-router.get('/api/movimentacao', Auth.verifyToken, MovimentacaoController.todas);
-router.post('/api/movimentacao', Auth.verifyToken, MovimentacaoController.nova);
-router.get('/api/movimentacoes/:idMovimentacao', Auth.verifyToken, MovimentacaoController.movimentacaoDetalhada);
+router.get('/api/produtos/:idProduto', ProdutoController.produtoDetalhado);
+router.get('/api/categorias', CategoriaController.todas);
+router.post('/api/categorias', CategoriaController.nova);
+router.patch('/api/categorias/:idCategoria', CategoriaController.atualizarCategoria);
+router.get('/api/movimentacao', MovimentacaoController.todas);
+router.post('/api/movimentacao',  MovimentacaoController.nova);
+router.get('/api/movimentacoes/:idMovimentacao', MovimentacaoController.movimentacaoDetalhada);
 
 export {router};
